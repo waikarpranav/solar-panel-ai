@@ -78,7 +78,8 @@ st.divider()
 if st.button("⚡ Generate Prediction"):
     if model and scaler:
         # Features: [hour, irradiance_W_m2, temperature_C, cloud_cover_percent, month]
-        input_data = np.array([[hour, irradiance, temp, cloud, month]])
+        feature_cols = ['hour', 'irradiance_W_m2', 'temperature_C', 'cloud_cover_percent', 'month']
+        input_data = pd.DataFrame([[hour, irradiance, temp, cloud, month]], columns=feature_cols)
         
         # Scale input
         input_scaled = scaler.transform(input_data)
@@ -90,10 +91,12 @@ if st.button("⚡ Generate Prediction"):
         st.success(f"### Predicted Energy: **{prediction:.2f} kWh**")
         
         # Diagnostics
-        if prediction > 40:
+        if prediction > 3.5:
             st.info("💡 **Diagnostic**: Peak production period detected. Optimal for high-demand tasks.")
-        elif prediction < 5:
+        elif prediction < 1.0:
             st.warning("☁️ **Diagnostic**: Low energy yield. Check for heavy cloud cover or low irradiance.")
+        else:
+            st.info("☀️ **Diagnostic**: Moderate energy generation. Normal operational conditions.")
     else:
         st.error("Error: Model files not found in `model/` directory. Please run the training notebooks first.")
 
